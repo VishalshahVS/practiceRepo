@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 
 
 function PracticeForm() {
-
-
+    
+    
     // FORMIK STARTED
     const initialValues = {
         NoOfAttendees: 0,
@@ -27,14 +27,16 @@ function PracticeForm() {
             { name: '', DOB: '' },
             { name: '', DOB: '' },
         ]
-
-
+        
+        
     }
     const { values, handleSubmit, handleChange, setFieldValue } = useFormik({
         initialValues
     });
     // FORMIK ENDED
-
+    
+    //GBP Total
+    const [totalGBP, setTotalGBP] = useState(0);
 
     //ARRAY FOR MAP
     const AttendeesCount = [1, 2, 3, 4, 5, 6]
@@ -72,7 +74,11 @@ function PracticeForm() {
     }
 
     const handleCheck = (e, index) => {
+        console.log(index,"&&&&&")
         setFieldValue(values.Attendees[index].location = (!values.Attendees[index].location))
+        setFieldValue(values.Attendees.map((value) => value.service.IVDrip = []))
+        setFieldValue(values.Attendees.map((value) => value.service.VitaminShots = []))
+        
     }
 
     const showIVDripTherapy = (e, index) => {
@@ -85,30 +91,28 @@ function PracticeForm() {
         setFieldValue(values.flags[index].IVDrip = false)
     }
 
-    //Here serviceIndex specifies category of Service & index specifies number of Attendee
-    /* const handleService = (e, { serviceIndex }, index) => {
 
+
+    const [checked, setChecked] = useState(false)
+    const handleIVDrip = (e, index, items) => {
+        const GBP = Number(...items.price.match(/\d+/g))
+        setChecked(!checked)
         if (e.target.checked) {
-            if (serviceIndex === 1) return setFieldValue(values.Attendees[index].service?.IVDrip.push(e.target.value))
-            else return setFieldValue(values.Attendees[index].service?.VitaminShots.push(e.target.value))
+            setFieldValue(values.Attendees[index].service.IVDrip.push({ service: items.service, price: items.price }))
+           
         }
         else {
-            if (serviceIndex === 2) return setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((element) => element !== e.target.value))
-            else return setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((item) => item !== e.target.value))
+            setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service?.IVDrip.filter((element) => element.service !== items.service))
         }
-    } */
-
-    const [checked,setChecked] = useState(false)    
-    const handleIVDrip = (e, index) => {
-        setChecked(!checked)
-        if (e.target.checked) return setFieldValue(values.Attendees[index].service.IVDrip.push(e.target.value))
-        else return setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service?.IVDrip.filter((element) => element !== e.target.value))
-
     }
-    const handleVitaminShots = (e, index) => {
-        if (e.target.checked) return setFieldValue(values.Attendees[index].service.VitaminShots.push(e.target.value))
-        else return setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service?.VitaminShots.filter((element) => element !== e.target.value))
-
+    const handleVitaminShots = (e, index, items) => {
+        const GBP = Number(items.price.slice(-2))
+        if (e.target.checked) {
+            setFieldValue(values.Attendees[index].service.VitaminShots.push({ service: items.service, price: items.price }))
+        }
+        else {
+            setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service?.VitaminShots.filter((element) => element.service !== items.service))
+        }
     }
 
     //ON CHANGE HANDLERS ENDED
@@ -138,16 +142,60 @@ function PracticeForm() {
     ]
 
 
+
     //REMOVE SERVICES---- HERE INDEX SPECIFIES ATTENDEE   
     const removeIVDrip = (e, i, index, items) => {
+        const GBP = Number(...items.price.match(/\d+/g))
+        setTotalGBP(totalGBP - GBP)
         setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((i) => i !== items))
-        setChecked(false)
-        // values.Attendees[index].service.IVDrip.filter((item) => item )
     }
     const removeVitaminShot = (e, i, index, items) => {
         setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((j) => j !== items))
-        setChecked(false)
     }
+
+    //CALCULATE GBP
+    const calculateGBP = () =>{
+    
+        const IVDrip = [];
+        const VitaminShots = [];
+
+        values.Attendees.map( (attendee) =>  attendee.service.IVDrip.map((items)=> IVDrip.push(Number(...items.price.match(/\d+/g)))) )
+        values.Attendees.map( (attendee) =>  attendee.service.VitaminShots.map((items)=> VitaminShots.push(Number (...items.price.match(/\d+/g)))) )
+        
+        
+            
+            var totalGBPOfIVDrip = IVDrip.reduce((firstElem,secondElem) => {
+                return firstElem + secondElem
+            },0);
+    
+            var totalGBPOfVitaminDrip = VitaminShots.reduce((firstElem,secondElem) => {
+                return firstElem + secondElem
+            },0)
+
+            setTotalGBP(totalGBPOfIVDrip + totalGBPOfVitaminDrip)
+    }
+    useEffect(()=>{
+    
+            const IVDrip = [];
+            const VitaminShots = [];
+    
+            values.Attendees.map( (attendee) =>  attendee.service.IVDrip.map((items)=> IVDrip.push(Number(...items.price.match(/\d+/g)))) )
+            values.Attendees.map( (attendee) =>  attendee.service.VitaminShots.map((items)=> VitaminShots.push(Number (...items.price.match(/\d+/g)))) )
+            
+            
+                
+                var totalGBPOfIVDrip = IVDrip.reduce((firstElem,secondElem) => {
+                    return firstElem + secondElem
+                },0);
+        
+                var totalGBPOfVitaminDrip = VitaminShots.reduce((firstElem,secondElem) => {
+                    return firstElem + secondElem
+                },0)
+    
+                setTotalGBP(totalGBPOfIVDrip + totalGBPOfVitaminDrip)
+    
+        
+    })
 
 
     console.log(values)
@@ -293,10 +341,8 @@ function PracticeForm() {
 
                                                                                 <input
                                                                                     type="checkbox"
-                                                                                    defaultChecked={false}
-                                                                                    checked={checked}
                                                                                     value={items.service + items.price}
-                                                                                    onChange={(e) => handleIVDrip(e, index)}
+                                                                                    onChange={(e) => handleIVDrip(e, index, items)}
                                                                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                                                                 />
                                                                                 <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -319,7 +365,7 @@ function PracticeForm() {
                                                                                 <input
                                                                                     type="checkbox"
                                                                                     value={items.service + items.price}
-                                                                                    onChange={(e) => handleVitaminShots(e, index)}
+                                                                                    onChange={(e) => handleVitaminShots(e, index, items)}
                                                                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                                                                 />
                                                                                 <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -422,30 +468,34 @@ function PracticeForm() {
                                         <div className='services'>
                                             {
                                                 values.Attendees[index].service.IVDrip.map((items, i) =>
-                                                    <div className='text-medium font-medium flex justify-between '>
-                                                        <p>{items}</p>
+                                                    <>
+                                                        <div className='text-medium font-medium flex justify-between '>
+                                                            <p>{items.service}</p>
+                                                            <p>{items.price}</p>
+                                                        </div>
                                                         <div
-                                                            className='underline cursor-pointer'
+                                                            className='flex underline cursor-pointer justify-items-end'
                                                             onClick={(e) => removeIVDrip(e, i, index, items)}>
                                                             Remove
                                                         </div>
-                                                    </div>
-
+                                                    </>
                                                 )
                                             }
                                             {
                                                 values.Attendees[index].service.VitaminShots.map((items, i) =>
-                                                    <div className='text-medium font-medium flex justify-between '>
-                                                        <p>{items}</p>
+                                                    <>
+                                                        <div className='text-medium font-medium flex justify-between '>
+                                                            <p>{items.service}</p>
+                                                            <p>{items.price}</p>
+                                                        </div>
                                                         <div
                                                             className='underline cursor-pointer'
                                                             onClick={(e) => removeVitaminShot(e, i, index, items)}>
                                                             Remove
                                                         </div>
-                                                    </div>
+                                                    </>
                                                 )
                                             }
-
 
                                         </div>
                                     </div>
@@ -455,6 +505,15 @@ function PracticeForm() {
                             }
                         </>
                     })
+                }
+                {
+                    totalGBP > 0 ?
+                    <div className='flex justify-between'>
+                        <p className='text-lg font-semibold mt-8'>Total </p>
+                        <p className='text-lg font-semibold mt-8'>GBP {totalGBP}</p>
+                    </div>
+                    :
+                    ''
                 }
             </div>
             {/* BOOKINGS DISPLAY ENDED*/}
