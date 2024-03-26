@@ -102,7 +102,8 @@ function Staging() {
 
 
     const [checked, setChecked] = useState(false)
-    const handleIVDrip = (e, index, items) => {
+    const handleIVDrip = (e, index, items,i) => {
+        console.log(i,"888888888888")
         const GBP = Number(...items.price.match(/\d+/g))
         setChecked(!checked)
         if (e.target.checked) {
@@ -312,18 +313,15 @@ function Staging() {
                                                                 <div className='serviceIVDrip flex gap-4 my-4'>
                                                                     {
                                                                         services[0].IVDrip.map((items, i) => {
-
-
-
-                                                                            return values.flags[index].IVDrip ?
-
-                                                                                <div className="flex items-center mb-4" >
+                                                                            return values.flags[index].IVDrip ?      
+                                                                                                                                                  
+                                                                                    <div className="flex items-center mb-4" >
 
                                                                                     <input
                                                                                         type="checkbox"
                                                                                         value={items.service + items.price}
-                                                                                        checked={values.Attendees[index].service.IVDrip[i] ? true : false}
-                                                                                        onChange={(e) => handleIVDrip(e, index, items)}
+                                                                                        defaultChecked={values.Attendees[index].service.IVDrip[i] ? values.Attendees[index].service.IVDrip[i].checked : false}
+                                                                                        onChange={(e) => handleIVDrip(e, index, items,i)}
                                                                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                                                                     />
                                                                                     <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -344,6 +342,7 @@ function Staging() {
                                                                     {
 
                                                                         services[1].VitaminShots.map((items, i) => {
+                                                                           
                                                                             return values.flags[index].VitaminShots ?
 
                                                                                 <div className="flex items-center mb-4"  >
