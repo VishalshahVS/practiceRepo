@@ -1,5 +1,5 @@
 import { useFormik, validateYupSchema } from 'formik';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 
 function PracticeForm() {
@@ -12,12 +12,12 @@ function PracticeForm() {
         InitialLocation: 'In Clinic',
         Attendees: [],
         flags: [
-            { IVDrip: true, VitaminShots: false },
-            { IVDrip: true, VitaminShots: false },
-            { IVDrip: true, VitaminShots: false },
-            { IVDrip: true, VitaminShots: false },
-            { IVDrip: true, VitaminShots: false },
-            { IVDrip: true, VitaminShots: false },
+            { IVDrip: true , VitaminShots: false},
+            { IVDrip: true , VitaminShots: false},
+            { IVDrip: true , VitaminShots: false},
+            { IVDrip: true , VitaminShots: false},
+            { IVDrip: true , VitaminShots: false},
+            { IVDrip: true , VitaminShots: false},
         ],
         personalDetails: [
             { name: '', email: '', contactNumber: '', DOB: '' },
@@ -79,36 +79,23 @@ function PracticeForm() {
         setFieldValue(values.flags[index].IVDrip = true)
         setFieldValue(values.flags[index].VitaminShots = false)
     }
-
+    
     const showVitaminShotsTherapy = (e, index) => {
         setFieldValue(values.flags[index].VitaminShots = true)
         setFieldValue(values.flags[index].IVDrip = false)
     }
 
     //Here serviceIndex specifies category of Service & index specifies number of Attendee
-    /* const handleService = (e, { serviceIndex }, index) => {
+    const handleService = (e, { serviceIndex }, index) => {
 
         if (e.target.checked) {
             if (serviceIndex === 1) return setFieldValue(values.Attendees[index].service?.IVDrip.push(e.target.value))
             else return setFieldValue(values.Attendees[index].service?.VitaminShots.push(e.target.value))
         }
         else {
-            if (serviceIndex === 2) return setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((element) => element !== e.target.value))
-            else return setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((item) => item !== e.target.value))
+            if (serviceIndex === 2) return setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((element) => element != e.target.value))
+            else return setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((item) => item != e.target.value))
         }
-    } */
-
-    const [checked,setChecked] = useState(false)    
-    const handleIVDrip = (e, index) => {
-        setChecked(!checked)
-        if (e.target.checked) return setFieldValue(values.Attendees[index].service.IVDrip.push(e.target.value))
-        else return setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service?.IVDrip.filter((element) => element !== e.target.value))
-
-    }
-    const handleVitaminShots = (e, index) => {
-        if (e.target.checked) return setFieldValue(values.Attendees[index].service.VitaminShots.push(e.target.value))
-        else return setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service?.VitaminShots.filter((element) => element !== e.target.value))
-
     }
 
     //ON CHANGE HANDLERS ENDED
@@ -118,39 +105,39 @@ function PracticeForm() {
     const services = [
         {
             IVDrip: [
-                { service: 'Miniboost ', price: 'GBP 85' },
-                { service: 'Hydromax ', price: 'GBP 109' },
-                { service: 'Ultraviv ', price: 'GBP 149' },
-                { service: 'Megaboost ', price: ' GBP 209' },
-                { service: 'Vitaglow ', price: ' GBP 209' },
-                { service: 'Royal Flush ', price: ' GBP 359' },
-                { service: 'HELIIX ', price: 'GBP 699' },
+                { service: 'Miniboost GBP 85' },
+                { service: 'Hydromax GBP 109' },
+                { service: 'Ultraviv GBP 149' },
+                { service: 'Megaboost GBP 209' },
+                { service: 'Vitaglow GBP 209' },
+                { service: 'Royal Flush GBP 359' },
+                { service: 'HELIIX GBP 699' },
             ]
         },
         {
             VitaminShots: [
-                { service: 'B12 Family ', price: 'GBP 35' },
-                { service: 'Slimboost ', price: 'GBP 45' },
-                { service: 'Biotin ', price: 'GBP 49' },
-                { service: 'CoQ10+ ', price: 'GBP 55' },
+                { service: 'B12 Family GBP 35' },
+                { service: 'Slimboost GBP 45' },
+                { service: 'Biotin GBP 49' },
+                { service: 'CoQ10+ GBP 55' },
             ]
         }
     ]
 
 
     //REMOVE SERVICES---- HERE INDEX SPECIFIES ATTENDEE   
-    const removeIVDrip = (e, i, index, items) => {
-        setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((i) => i !== items))
-        setChecked(false)
+    const removeIVDrip = (e,i,index,items) =>{
+        setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((i)=> i !== items))
+
         // values.Attendees[index].service.IVDrip.filter((item) => item )
     }
-    const removeVitaminShot = (e, i, index, items) => {
-        setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((j) => j !== items))
-        setChecked(false)
+    const removeVitaminShot = (e,i,index,item) =>{
+            console.log(i,"&&&&&&")
     }
 
 
     console.log(values)
+
     return (
 
         /* MASTER DIV STARTED */
@@ -285,52 +272,50 @@ function PracticeForm() {
 
                                                             <div>
 
+                                                                        
+                                                                        <div className='serviceIVDrip flex gap-4 my-4'>
+                                                                            {
+                                                                                services[0].IVDrip.map((items) => {
+                                                                                    return  <div className="flex items-center mb-4" >
+                                                                                        
+                                                                                                <input
+                                                                                                    type="checkbox"
+                                                                                                    value={items.service}
+                                                                                                    onChange={(e) => handleService(e, { serviceIndex: 1 }, index)}
+                                                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                                                                />
+                                                                                                <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                                                                                    {items.service}
+                                                                                                </label>
 
-                                                                <div className='serviceIVDrip flex gap-4 my-4'>
-                                                                    {
-                                                                        services[0].IVDrip.map((items) => {
-                                                                            return <div className="flex items-center mb-4" >
+                                                                                            </div>
+                                                                                })
 
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    defaultChecked={false}
-                                                                                    checked={checked}
-                                                                                    value={items.service + items.price}
-                                                                                    onChange={(e) => handleIVDrip(e, index)}
-                                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                                                                />
-                                                                                <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                                                    {items.service + items.price}
-                                                                                </label>
+                                                                            }
+                                                                        </div>
 
-                                                                            </div>
-                                                                        })
+                                                                 
+                                                                
+                                                                        <div className='serviceVitamin flex gap-4 my-4'>
+                                                                            {
 
-                                                                    }
-                                                                </div>
+                                                                                services[1].VitaminShots.map((items,i) => {
+                                                                                    return <div className="flex items-center mb-4"  >
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            value={items.service}
+                                                                                            onChange={(e) => handleService(e, { serviceIndex: 2 }, index)}
+                                                                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                                                        />
+                                                                                        <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                                                                            {items.service}
+                                                                                        </label>
+                                                                                    </div>
+                                                                                })
+                                                                            }
 
-
-
-                                                                <div className='serviceVitamin flex gap-4 my-4'>
-                                                                    {
-
-                                                                        services[1].VitaminShots.map((items, i) => {
-                                                                            return <div className="flex items-center mb-4"  >
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    value={items.service + items.price}
-                                                                                    onChange={(e) => handleVitaminShots(e, index)}
-                                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                                                                />
-                                                                                <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                                                    {items.service + items.price}
-                                                                                </label>
-                                                                            </div>
-                                                                        })
-                                                                    }
-
-                                                                </div>
-
+                                                                        </div>
+                                                                     
 
                                                             </div>
 
@@ -379,6 +364,7 @@ function PracticeForm() {
                                                                     value={values.personalDetails[index].contactNumber}
                                                                     placeholder='Enter Contact Number'
                                                                     onChange={handleChange}
+                                                                // onChange={(e) => handleNumber(e,index)}
                                                                 />
                                                                 <br />
                                                             </>
@@ -421,28 +407,28 @@ function PracticeForm() {
                                         <p className='text-xl font-medium'>Attendee {value}</p>
                                         <div className='services'>
                                             {
-                                                values.Attendees[index].service.IVDrip.map((items, i) =>
+                                                values.Attendees[index].service.IVDrip.map((items,i) =>
                                                     <div className='text-medium font-medium flex justify-between '>
                                                         <p>{items}</p>
-                                                        <div
+                                                        <div 
                                                             className='underline cursor-pointer'
-                                                            onClick={(e) => removeIVDrip(e, i, index, items)}>
+                                                            onClick={(e)=>removeIVDrip(e,i,index,items)}>
                                                             Remove
                                                         </div>
                                                     </div>
-
+                                                 
                                                 )
                                             }
                                             {
-                                                values.Attendees[index].service.VitaminShots.map((items, i) =>
-                                                    <div className='text-medium font-medium flex justify-between '>
-                                                        <p>{items}</p>
-                                                        <div
-                                                            className='underline cursor-pointer'
-                                                            onClick={(e) => removeVitaminShot(e, i, index, items)}>
-                                                            Remove
-                                                        </div>
-                                                    </div>
+                                                values.Attendees[index].service.VitaminShots.map((items,i) =>
+                                                <div className='text-medium font-medium flex justify-between '>
+                                                <p>{items}</p>
+                                                <div 
+                                                    className='underline cursor-pointer'
+                                                    onClick={(e)=>removeVitaminShot(e,i,index,items)}>
+                                                    Remove
+                                                </div>
+                                            </div>
                                                 )
                                             }
 
