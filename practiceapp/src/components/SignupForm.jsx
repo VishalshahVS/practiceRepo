@@ -1,137 +1,85 @@
-import React, { useState } from 'react';
-import { useFormik } from 'formik';
-
-const SignupForm = () => {
-  const {values,handlechange,setFieldValue} = useFormik({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      checkBoxData: [
-        { checkBox: '' },
-        { checkBox: '' },
-        { checkBox: '' },
-        { checkBox: '' },
-      ],
-      flags: [
-        {IVDrip:false},
-        {VitaminShots:false},
-      ]
-      
-    },
-    onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
+import { useFormik, validateYupSchema } from 'formik';
+import React, { useEffect, useState } from 'react'
+import SignupValidation from '../schema/SignupValidation';
 
 
-  //SERVICES DATA
-  const services = [
-    {
-      IVDrip: [
-        { service: 'Miniboost ', price: 'GBP 85' },
-        { service: 'Hydromax ', price: 'GBP 109' },
-        { service: 'Ultraviv ', price: 'GBP 149' },
-        { service: 'Megaboost ', price: ' GBP 209' },
-        { service: 'Vitaglow ', price: ' GBP 209' },
-        { service: 'Royal Flush ', price: ' GBP 359' },
-        { service: 'HELIIX ', price: 'GBP 699' },
-      ]
-    },
-    {
-      VitaminShots: [
-        { service: 'B12 Family ', price: 'GBP 35' },
-        { service: 'Slimboost ', price: 'GBP 45' },
-        { service: 'Biotin ', price: 'GBP 49' },
-        { service: 'CoQ10+ ', price: 'GBP 55' },
-      ]
+function Staging() {
+
+
+    // FORMIK STARTED
+    const initialValues = {
+        obj: {
+            innerObj: {
+                names: [],
+                numbers: []
+            }
+        }
+
     }
-  ]
-
-  const [flagIvDrip, setFlagIvDrip] = useState(true)
-  const [flagVitaminShots, setflagVitaminShots] = useState(false)
-
-  const handleIVDrip = () => {
-    setFlagIvDrip(true)
-    setflagVitaminShots(false)
-  }
-  
-  const handleVitaminShots = () => {
-    setflagVitaminShots(true)
-    setFlagIvDrip(false)
-  }
-
-  
-
-  const handleFirstName = (e) =>{
-    console.log("Fname :",e.target.value , "Status:",e.target.checked )
-    setFieldValue(values.firstName = e.target.value)
-    setFieldValue(values.flags[0].IVDrip = true)
-    
-  }
-  const handleLastName = (e) =>{
-    console.log("Lname :",e.target.value , "Status:",e.target.checked )  
-    setFieldValue(values.lastName = e.target.value)
-    setFieldValue(values.flags[1].VitaminShots = true)
-
-  }
-/* 
-  const flags = [
-    {IVDrip:false},
-    {VitaminShots:false},
-  ] */
-  return (
-    <form >
-      <div className='flex gap-4 justify-center align-center '>
-        <div
-          className='cursor:pointer'
-          onClick={handleIVDrip}
-        >
-          IVDrip
-        </div>
-        <div
-          className='cursor:pointer'
-          onClick={handleVitaminShots}>
-          VitaminShots
-        </div>
-      </div>
-      <div className='flex justify-center align-center'>
-        {
-          flagIvDrip ?
-           
-          <>
-              First Name:
-              <input 
-                type="checkbox" 
-                name="firstName" 
-                defaultChecked={values.flags[0].IVDrip}
-                id="fname"
-                value="Vishal "
-                onChange={(e) => handleFirstName(e) }/>
-          </>
-          :
-          ''
+    const { values, handleSubmit, handleChange, setFieldValue, touched, errors } = useFormik({
+        initialValues,
+        validationSchema: SignupValidation,
+        onSubmit: (value, action) => {
+            console.log("submitted")
         }
-        
-        {
-          flagVitaminShots ?
+    });
+    // FORMIK ENDED
 
-          <>
-          Last Name:
-          <input 
-            type="checkbox" 
-            name="lastName" 
-            defaultChecked= {values.flags[1].VitaminShots}
-            id="lname"
-            value="Shah"
-            onChange={(e) => handleLastName(e)}/>
-      </>
-      :
-      ''
-        }
-      </div>
-    </form>
-  );
-};
 
-export default SignupForm
+    const handleAdd = (e) => {
+        values.obj.innerObj.names.push({ text: 'name1' })
+    }
+
+    console.log(errors, "Errors")
+    console.log(values,"values")
+    return (
+
+        /* MASTER DIV STARTED */
+        <div className='container flex border w-full h-[60%] mx-auto my-10'>
+
+
+            {/* FORM STARTED */}
+            <div className='container border w-[55%] ms-8'>
+                <form onSubmit={handleSubmit} >
+
+                    <input
+                        type="text"
+                        placeholder='Enter Name'
+
+                    />
+                    {
+                        errors.obj?.innerObj?.names && touched.obj?.innerObj?.names ? <div>{errors.obj?.innerObj?.names}</div> : null
+                    }
+
+                    {/* <input
+                        type="text"
+                        placeholder='Enter Name'
+                        className='mt-8'
+                    /> */}
+                    <br />
+                    <button
+                        type="button"
+                        onClick={(e)=> handleAdd(e)}
+                        className=" mt-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                        Add Data
+                    </button>
+                    <button
+                        type="submit"
+                        className=" mt-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                        Submit
+                    </button>
+                </form>
+            </div>
+            {/* FORM ENDED */}
+
+
+
+        </div>
+
+        /* MASTER DIV ENDED */
+
+
+    )
+}
+
+export default Staging

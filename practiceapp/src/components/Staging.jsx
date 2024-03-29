@@ -8,9 +8,9 @@ function Staging() {
 
     // FORMIK STARTED
     const initialValues = {
-        NoOfAttendees: 0,
+        NoOfAttendees: '',
         DateTime: { Date: '', Time: '' },
-        InitialLocation: 'In Clinic',
+        InitialLocation: '',
         Attendees: [],
         flags: [
             { IVDrip: true, VitaminShots: false },
@@ -20,29 +20,24 @@ function Staging() {
             { IVDrip: true, VitaminShots: false },
             { IVDrip: true, VitaminShots: false },
         ],
-        personalDetails: [
-            { name: '', email: '', contactNumber: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-        ],
-        comments: '',
-        GBP: ''
 
+        comments: '',
+        GBP: '',
     }
-    const { values, handleSubmit, handleChange, setFieldValue } = useFormik({
+    const { values, handleSubmit, handleChange, setFieldValue, touched, errors } = useFormik({
         initialValues,
-        validationSchema:PracticeFormValidation,
-        onSubmit: ( state,action) => {
+        validationSchema: PracticeFormValidation,
+        onSubmit: (state, action) => {
             console.log("submitted")
+
         }
     });
     // FORMIK ENDED
 
+
     //GBP Total
     const [totalGBP, setTotalGBP] = useState(0);
+
 
     //ARRAY FOR MAP
     const AttendeesCount = [1, 2, 3, 4, 5, 6]
@@ -50,20 +45,35 @@ function Staging() {
     const AttendeesCountForBookings = [1, 2, 3, 4, 5, 6]
 
 
-
     //ONCHANGE HANDLERS STARTED
     const handleNumberOfAttendees = (e) => {
         setFieldValue(values.NoOfAttendees = Number(e.target.value))
+      
+
+
         const AttendeesToPush = [];
         for (let i = 0; i < e.target.value; i++) {
-            AttendeesToPush.push({
-                location: true,
-                service: {
-                    IVDrip: [],
-                    VitaminShots: []
-                },
-                Details: []
-            })
+
+            if (i < 1) {
+                AttendeesToPush.push({
+                    location: true,
+                    service: {
+                        IVDrip: [],
+                        VitaminShots: []
+                    },
+                    personalDetails: { name: '', email: '', contactNumber: '', DOB: '' }
+                })
+            }
+            else {
+                AttendeesToPush.push({
+                    location: true,
+                    service: {
+                        IVDrip: [],
+                        VitaminShots: []
+                    },
+                    personalDetails: { name: '', DOB: '' }
+                })
+            }
         }
         setFieldValue(values.Attendees = AttendeesToPush)
     }
@@ -101,13 +111,17 @@ function Staging() {
 
 
 
-    const [checked, setChecked] = useState(false)
-    const handleIVDrip = (e, index, items,i) => {
-        console.log(i,"888888888888")
+
+    const handleIVDrip = (e, index, items, i) => {
+        console.log('e:', e)
+        console.log('Index:', index)
+        console.log('items:', items)
+        console.log('i:', i)
         const GBP = Number(...items.price.match(/\d+/g))
-        setChecked(!checked)
+
+
         if (e.target.checked) {
-            setFieldValue(values.Attendees[index].service.IVDrip.push({ service: items.service, price: items.price, checked: true }))
+            setFieldValue(values.Attendees[index].service.IVDrip.push({ service: items.service, price: items.price }))
             setTotalGBP(totalGBP + GBP)
             setFieldValue(values.GBP = totalGBP + GBP)
         }
@@ -117,7 +131,12 @@ function Staging() {
             setFieldValue(values.GBP = totalGBP + GBP)
         }
     }
+
     const handleVitaminShots = (e, index, items) => {
+
+
+
+
         const GBP = Number(items.price.slice(-2))
         if (e.target.checked) {
             setFieldValue(values.Attendees[index].service.VitaminShots.push({ service: items.service, price: items.price }))
@@ -131,6 +150,13 @@ function Staging() {
         }
     }
 
+    const handlePersonalDetails = (e, index) => {
+        if(e.target.name == 'name') return setFieldValue(values.Attendees[index].personalDetails.name = e.target.value)
+        if(e.target.name == 'email') return setFieldValue(values.Attendees[index].personalDetails.email = e.target.value)
+        if(e.target.name == 'DOB') return setFieldValue(values.Attendees[index].personalDetails.DOB = e.target.value)
+        if(e.target.name == 'contactNumber') return setFieldValue(values.Attendees[index].personalDetails.contactNumber = e.target.value)
+        
+    }
     //ON CHANGE HANDLERS ENDED
 
 
@@ -161,6 +187,7 @@ function Staging() {
 
     //REMOVE SERVICES---- HERE INDEX SPECIFIES ATTENDEE   
     const removeIVDrip = (e, i, index, items) => {
+
         const GBP = Number(...items.price.match(/\d+/g))
         setTotalGBP(totalGBP - GBP)
         setFieldValue(values.GBP = totalGBP - GBP)
@@ -175,7 +202,9 @@ function Staging() {
     }
 
 
-    console.log(values)
+    console.log(values, "Values")
+    console.log(errors, "Errors")
+
     return (
 
         /* MASTER DIV STARTED */
@@ -205,10 +234,15 @@ function Staging() {
                                             onChange={(e) => handleNumberOfAttendees(e)}
                                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                                         />
+
                                     </div>
                                 })
                             }
                         </div>
+                        {
+                            errors.NoOfAttendees && touched.NoOfAttendees ? <div>{errors.NoOfAttendees + '*'}</div> : null
+                        }
+
                     </>
 
                     {/* INITIAL LOCATION */}
@@ -236,6 +270,9 @@ function Staging() {
                                 <label for="InitialLocation" className="ms-2 text-sm font-semibold text-xl text-gray-900 dark:text-gray-300">At Home</label>
                             </div>
                         </div>
+                        {
+                            errors.InitialLocation && touched.InitialLocation ? <div>{errors.InitialLocation + '*'}</div> : null
+                        }
                     </>
 
                     {/* DATE AND TIME */}
@@ -250,13 +287,25 @@ function Staging() {
                                 name="DateTime"
                                 onChange={(e) => handleDate(e)}
                             />
+                            {
+                                errors.DateTime?.Date && touched.DateTime?.Date ? <div>{errors.DateTime?.Date + '*'}</div>
+                                    : null
+                            }
+
+
                             <input
                                 type="time"
                                 name="DateTime"
-                                onChange={(e) => handleTime(e)} />
-
+                                onChange={(e) => handleTime(e)}
+                            />
+                            {
+                                errors.DateTime?.Time && touched.DateTime?.Time ? <div>{errors.DateTime?.Time + '*'}</div>
+                                    : null
+                            }
                         </div>
+
                     </>
+
 
                     <>
                         {
@@ -269,7 +318,7 @@ function Staging() {
                                         <h1 className='text-2xl mt-8 mb-4'>Select Your Services</h1>
 
                                         {AttendeesCount.splice(0, values.NoOfAttendees).map((Attendee, index) => {
-                                            return <div className='container border mb-8'>
+                                            return <div className='contianer border mb-8'>
 
                                                 {/* NAME OF ATTENDEE */}
                                                 <h1 className='text-semibold font-xl'>Attendee {Attendee}</h1>
@@ -282,7 +331,7 @@ function Staging() {
                                                         className="sr-only peer"
                                                     />
                                                     <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{values.InitialLocation}</span>
+                                                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{values.InitialLocation == '' ? 'In Clinic' : values.InitialLocation}</span>
                                                 </label>
 
                                                 {/* CATEGORY OF SERVICE */}
@@ -313,24 +362,22 @@ function Staging() {
                                                                 <div className='serviceIVDrip flex gap-4 my-4'>
                                                                     {
                                                                         services[0].IVDrip.map((items, i) => {
-                                                                            return values.flags[index].IVDrip ?      
-                                                                                                                                                  
-                                                                                    <div className="flex items-center mb-4" >
+                                                                            return <div className={`flex items-center mb-4 ${values.flags[index].IVDrip ? "" : "hidden"}`} >
+                                                                                {/* <div className={`flex items-center mb-4 ${values.flags[index].IVDrip ?  "": "hidden"}`} > */}
 
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        value={items.service + items.price}
-                                                                                        defaultChecked={values.Attendees[index].service.IVDrip[i] ? values.Attendees[index].service.IVDrip[i].checked : false}
-                                                                                        onChange={(e) => handleIVDrip(e, index, items,i)}
-                                                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                                                                    />
-                                                                                    <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                                                        {items.service + items.price}
-                                                                                    </label>
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    value={items.service + items.price}
+                                                                                    checked={values.Attendees[index].service.IVDrip.some((elm) => elm.service == items.service)}
+                                                                                    onChange={(e) => handleIVDrip(e, index, items, i)}
+                                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                                                />
+                                                                                <label for="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                                                                    {items.service + items.price}
+                                                                                </label>
 
-                                                                                </div>
-                                                                                :
-                                                                                ''
+                                                                            </div>
+
                                                                         })
 
                                                                     }
@@ -342,14 +389,14 @@ function Staging() {
                                                                     {
 
                                                                         services[1].VitaminShots.map((items, i) => {
-                                                                           
+
                                                                             return values.flags[index].VitaminShots ?
 
                                                                                 <div className="flex items-center mb-4"  >
                                                                                     <input
                                                                                         type="checkbox"
                                                                                         value={items.service + items.price}
-                                                                                        checked={values.Attendees[index].service.VitaminShots[i] ? true : false}
+                                                                                        checked={values.Attendees[index].service.VitaminShots.some((elm) => elm.service == items.service)}
                                                                                         onChange={(e) => handleVitaminShots(e, index, items)}
                                                                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                                                                     />
@@ -363,6 +410,15 @@ function Staging() {
                                                                     }
 
                                                                 </div>
+                                                                {
+                                                                    errors.Attendees ?
+                                                                        errors.Attendees[index] && touched.Attendees ?
+                                                                            <div>Required</div>
+                                                                            :
+                                                                            null
+                                                                        :
+                                                                        null
+                                                                }
 
 
                                                             </div>
@@ -388,10 +444,10 @@ function Staging() {
                                                     <h1 className='text-semibold font-xl'>Attendee {Attendee}</h1>
                                                     <input
                                                         type='text'
-                                                        name={`personalDetails[${index}].name`}
-                                                        value={values.personalDetails[index].name}
+                                                        name='name'
+                                                        // value={values.personalDetails[index].name}
                                                         placeholder='Enter Name'
-                                                        onChange={handleChange}
+                                                        onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
                                                     <br />
                                                     {
@@ -399,19 +455,19 @@ function Staging() {
                                                             <>
                                                                 <input
                                                                     type='email'
-                                                                    name={`personalDetails[${index}].email`}
-                                                                    value={values.personalDetails[index].email}
-                                                                    onChange={handleChange}
+                                                                    name='email'
+                                                                    // value={values.personalDetails[index].email}
+                                                                    onChange={(e) => handlePersonalDetails(e, index)}
                                                                     placeholder='Enter Email'
 
                                                                 />
                                                                 <br />
                                                                 <input
                                                                     type='tel'
-                                                                    name={`personalDetails[${index}].contactNumber`}
-                                                                    value={values.personalDetails[index].contactNumber}
+                                                                    name='contactNumber'
+                                                                    // value={values.personalDetails[index].contactNumber}
                                                                     placeholder='Enter Contact Number'
-                                                                    onChange={handleChange}
+                                                                    onChange={(e) => handlePersonalDetails(e, index)}
                                                                 />
                                                                 <br />
                                                             </>
@@ -420,9 +476,9 @@ function Staging() {
                                                     }
                                                     <input
                                                         type='date'
-                                                        name={`personalDetails[${index}].DOB`}
-                                                        value={values.personalDetails[index].DOB}
-                                                        onChange={handleChange}
+                                                        name='DOB'
+                                                        // value={values.personalDetails[index].DOB}
+                                                        onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
 
                                                 </div>
@@ -445,10 +501,10 @@ function Staging() {
                         onChange={handleChange}
                         className='w-[40%] my-8' />
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className=" mt-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                            Submit
+                        Submit
                     </button>
 
                 </form>
