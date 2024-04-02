@@ -22,7 +22,11 @@ function Staging() {
         ],
 
         comments: '',
-        GBP: '',
+        GBP: 0,
+        experiment: [
+            { experiment1: '', experiment2: '' },
+            { experiment1: '' }
+        ]
     }
     const { values, handleSubmit, handleChange, setFieldValue, touched, errors } = useFormik({
         initialValues,
@@ -35,48 +39,125 @@ function Staging() {
     // FORMIK ENDED
 
 
-    //GBP Total
-    const [totalGBP, setTotalGBP] = useState(0);
-
-
     //ARRAY FOR MAP
     const AttendeesCount = [1, 2, 3, 4, 5, 6]
     const AttendeesCountForContact = [1, 2, 3, 4, 5, 6]
     const AttendeesCountForBookings = [1, 2, 3, 4, 5, 6]
 
 
+    //GBP CALCULATION
+    function calculateGBP(){
+        let GBP=0;
+        values.Attendees?.map((val)=> {
+            val.service.IVDrip.map((ivDrip)=>{
+                GBP += Number(ivDrip?.price.match(/\d+/g))
+            })
+            val.service.VitaminShots.map((vitaminShots) =>{
+                GBP += Number(vitaminShots?.price.match(/\d+/g))
+            })
+        }) 
+        setFieldValue(values.GBP = GBP)
+    }
+
+
     //ONCHANGE HANDLERS STARTED
-    const handleNumberOfAttendees = (e) => {
-        setFieldValue(values.NoOfAttendees = Number(e.target.value))
-      
+
+    const handleNumberOfAttendees = (e,index) => {
+
+        var AttendeesToPush = [];
 
 
-        const AttendeesToPush = [];
-        for (let i = 0; i < e.target.value; i++) {
+        //FIRST TIME
+        if (values.Attendees.length < 1) {
 
-            if (i < 1) {
-                AttendeesToPush.push({
-                    location: true,
-                    service: {
-                        IVDrip: [],
-                        VitaminShots: []
-                    },
-                    personalDetails: { name: '', email: '', contactNumber: '', DOB: '' }
-                })
+            for (let i = AttendeesToPush.length; i < e.target.value; i++) {
+                if (i < 1) {
+                    AttendeesToPush.push({
+                        location: true,
+                        service: {
+                            IVDrip: [],
+                            VitaminShots: []
+                        },
+                        personalDetails: { name: '', email: '', contactNumber: '', DOB: '' }
+                    })
+                }
+                else {
+                    AttendeesToPush.push({
+                        location: true,
+                        service: {
+                            IVDrip: [],
+                            VitaminShots: []
+                        },
+                        personalDetails: { name: '', DOB: '' }
+                    })
+                }
             }
-            else {
-                AttendeesToPush.push({
+            setFieldValue(values.Attendees = AttendeesToPush)
+            setFieldValue(values.NoOfAttendees = Number(e.target.value))
+
+            let GBP=0;
+            values.Attendees?.map((val)=> {
+                val.service.IVDrip.map((ivDrip)=>{
+                    GBP += Number(ivDrip?.price.match(/\d+/g))
+                })
+                val.service.VitaminShots.map((vitaminShots) =>{
+                    GBP += Number(vitaminShots?.price.match(/\d+/g))
+                })
+            }) 
+            setFieldValue(values.GBP = GBP)
+        }
+
+        else {
+
+            /*   const AttendeesToPushAfterInitialIteraction = values?.Attendees */
+            if(values.Attendees.find((val,indx) => indx == e.target.value-1)){
+                // let totalGBPToReduce ;
+
+               /*  values.Attendees[index+1].service.IVDrip.map((val)=>{
+                    // Number(values.Attendees?.[index].service.IVDrip[0].price.match(/\d+/g)))
+                    totalGBPToReduce = totalGBPToReduce +  Number(val.price.match(/\d+/g))
+                })
+                values.Attendees[index+1].service.VitaminShots.map((val)=>{
+                    // Number(values.Attendees?.[index].service.IVDrip[0].price.match(/\d+/g)))
+                    totalGBPToReduce = totalGBPToReduce +  Number(val.price.match(/\d+/g))
+                }) */
+               /*  console.log(totalGBPToReduce,"))()()()()") */
+                values.Attendees.splice(e.target.value)
+
+                
+            }
+
+            const array2 = []
+            for (let j = values.Attendees.length; j < e.target.value; j++) {
+                array2.push({
                     location: true,
                     service: {
                         IVDrip: [],
                         VitaminShots: []
                     },
                     personalDetails: { name: '', DOB: '' }
-                })
+                });
             }
+            setFieldValue(values.Attendees = [...values.Attendees, ...array2])
+            setFieldValue(values.NoOfAttendees = Number(e.target.value))
+
+            let GBP=0;
+            values.Attendees?.map((val)=> {
+                val.service.IVDrip.map((ivDrip)=>{
+                    GBP += Number(ivDrip?.price.match(/\d+/g))
+                })
+                val.service.VitaminShots.map((vitaminShots) =>{
+                    GBP += Number(vitaminShots?.price.match(/\d+/g))
+                })
+            }) 
+            setFieldValue(values.GBP = GBP)
         }
-        setFieldValue(values.Attendees = AttendeesToPush)
+
+
     }
+
+
+
 
     const handleLocation = (e) => {
         setFieldValue(values.InitialLocation = e.target.value)
@@ -94,9 +175,7 @@ function Staging() {
         setFieldValue(values.Attendees[index].location = (!values.Attendees[index].location))
         setFieldValue(values.Attendees.map((value) => value.service.IVDrip = []))
         setFieldValue(values.Attendees.map((value) => value.service.VitaminShots = []))
-        setTotalGBP(0)
-        setFieldValue(values.GBP = 0)
-
+        calculateGBP();
     }
 
     const showIVDripTherapy = (e, index) => {
@@ -117,45 +196,38 @@ function Staging() {
         console.log('Index:', index)
         console.log('items:', items)
         console.log('i:', i)
-        const GBP = Number(...items.price.match(/\d+/g))
-
-
+        // const GBP = Number(...items.price.match(/\d+/g))
         if (e.target.checked) {
-            setFieldValue(values.Attendees[index].service.IVDrip.push({ service: items.service, price: items.price }))
-            setTotalGBP(totalGBP + GBP)
-            setFieldValue(values.GBP = totalGBP + GBP)
+            setFieldValue(values.Attendees[index].service.IVDrip.push(items))
+
+            //GBP Calculation
+            calculateGBP()
         }
         else {
+       
             setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service?.IVDrip.filter((element) => element.service !== items.service))
-            setTotalGBP(totalGBP - GBP)
-            setFieldValue(values.GBP = totalGBP + GBP)
+            calculateGBP()
         }
     }
 
     const handleVitaminShots = (e, index, items) => {
-
-
-
-
         const GBP = Number(items.price.slice(-2))
         if (e.target.checked) {
             setFieldValue(values.Attendees[index].service.VitaminShots.push({ service: items.service, price: items.price }))
-            setTotalGBP(totalGBP + GBP)
-            setFieldValue(values.GBP = totalGBP + GBP)
+            calculateGBP()
         }
         else {
             setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service?.VitaminShots.filter((element) => element.service !== items.service))
-            setTotalGBP(totalGBP - GBP)
-            setFieldValue(values.GBP = totalGBP - GBP)
+            calculateGBP()
         }
     }
 
     const handlePersonalDetails = (e, index) => {
-        if(e.target.name == 'name') return setFieldValue(values.Attendees[index].personalDetails.name = e.target.value)
-        if(e.target.name == 'email') return setFieldValue(values.Attendees[index].personalDetails.email = e.target.value)
-        if(e.target.name == 'DOB') return setFieldValue(values.Attendees[index].personalDetails.DOB = e.target.value)
-        if(e.target.name == 'contactNumber') return setFieldValue(values.Attendees[index].personalDetails.contactNumber = e.target.value)
-        
+        if (e.target.name == 'name') return setFieldValue(values.Attendees[index].personalDetails.name = e.target.value)
+        if (e.target.name == 'email') return setFieldValue(values.Attendees[index].personalDetails.email = e.target.value)
+        if (e.target.name == 'DOB') return setFieldValue(values.Attendees[index].personalDetails.DOB = e.target.value)
+        if (e.target.name == 'contactNumber') return setFieldValue(values.Attendees[index].personalDetails.contactNumber = e.target.value)
+
     }
     //ON CHANGE HANDLERS ENDED
 
@@ -185,25 +257,25 @@ function Staging() {
 
 
 
+
+
     //REMOVE SERVICES---- HERE INDEX SPECIFIES ATTENDEE   
     const removeIVDrip = (e, i, index, items) => {
 
-        const GBP = Number(...items.price.match(/\d+/g))
-        setTotalGBP(totalGBP - GBP)
-        setFieldValue(values.GBP = totalGBP - GBP)
+        // const GBP = Number(...items.price.match(/\d+/g))
         setFieldValue(values.Attendees[index].service.IVDrip = values.Attendees[index].service.IVDrip.filter((i) => i !== items))
-        // values.Attendees[index].service.IVDrip.filter((item) => item )
+        calculateGBP()
+    
     }
     const removeVitaminShot = (e, i, index, items) => {
-        const GBP = Number(...items.price.match(/\d+/g))
-        setTotalGBP(totalGBP - GBP)
-        setFieldValue(values.GBP = totalGBP - GBP)
+        // const GBP = Number(...items.price.match(/\d+/g))
         setFieldValue(values.Attendees[index].service.VitaminShots = values.Attendees[index].service.VitaminShots.filter((j) => j !== items))
+        calculateGBP()
     }
 
-
     console.log(values, "Values")
-    console.log(errors, "Errors")
+
+
 
     return (
 
@@ -231,7 +303,7 @@ function Staging() {
                                             type="radio"
                                             name="NoOfAttendees"
                                             value={index + 1}
-                                            onChange={(e) => handleNumberOfAttendees(e)}
+                                            onChange={(e) => handleNumberOfAttendees(e,index)}
                                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                                         />
 
@@ -362,11 +434,15 @@ function Staging() {
                                                                 <div className='serviceIVDrip flex gap-4 my-4'>
                                                                     {
                                                                         services[0].IVDrip.map((items, i) => {
-                                                                            return <div className={`flex items-center mb-4 ${values.flags[index].IVDrip ? "" : "hidden"}`} >
+                                                                            return <div
+                                                                                className={`flex items-center mb-4 ${values.flags[index].IVDrip ? "" : "hidden"}`}
+
+                                                                            >
                                                                                 {/* <div className={`flex items-center mb-4 ${values.flags[index].IVDrip ?  "": "hidden"}`} > */}
 
                                                                                 <input
                                                                                     type="checkbox"
+                                                                                    key={`IvDrip${i}`}
                                                                                     value={items.service + items.price}
                                                                                     checked={values.Attendees[index].service.IVDrip.some((elm) => elm.service == items.service)}
                                                                                     onChange={(e) => handleIVDrip(e, index, items, i)}
@@ -392,9 +468,13 @@ function Staging() {
 
                                                                             return values.flags[index].VitaminShots ?
 
-                                                                                <div className="flex items-center mb-4"  >
+                                                                                <div
+                                                                                    className="flex items-center mb-4"
+
+                                                                                >
                                                                                     <input
                                                                                         type="checkbox"
+                                                                                        key={`Vitaminshots${i}`}
                                                                                         value={items.service + items.price}
                                                                                         checked={values.Attendees[index].service.VitaminShots.some((elm) => elm.service == items.service)}
                                                                                         onChange={(e) => handleVitaminShots(e, index, items)}
@@ -449,6 +529,12 @@ function Staging() {
                                                         placeholder='Enter Name'
                                                         onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
+                                                    {
+                                                        errors?.Attendees?.[index]?.personalDetails?.name && touched.Attendees?.[index]?.personalDetails?.name ?
+                                                            <div>{errors?.Attendees[index]?.personalDetails?.name}</div>
+                                                            :
+                                                            null
+                                                    }
                                                     <br />
                                                     {
                                                         index < 1 ?
@@ -461,6 +547,12 @@ function Staging() {
                                                                     placeholder='Enter Email'
 
                                                                 />
+                                                                {
+                                                                    errors?.Attendees?.[index]?.personalDetails?.email && touched.Attendees?.[index]?.personalDetails?.email ?
+                                                                        <div>{errors?.Attendees[index]?.personalDetails?.email}</div>
+                                                                        :
+                                                                        null
+                                                                }
                                                                 <br />
                                                                 <input
                                                                     type='tel'
@@ -469,6 +561,12 @@ function Staging() {
                                                                     placeholder='Enter Contact Number'
                                                                     onChange={(e) => handlePersonalDetails(e, index)}
                                                                 />
+                                                                {
+                                                                    errors?.Attendees?.[index]?.personalDetails?.contactNumber && touched.Attendees?.[index]?.personalDetails?.contactNumber ?
+                                                                        <div>{errors?.Attendees[index]?.personalDetails?.contactNumber}</div>
+                                                                        :
+                                                                        null
+                                                                }
                                                                 <br />
                                                             </>
                                                             :
@@ -480,11 +578,17 @@ function Staging() {
                                                         // value={values.personalDetails[index].DOB}
                                                         onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
-
+                                                    {
+                                                        errors?.Attendees?.[index]?.personalDetails?.DOB && touched.Attendees?.[index]?.personalDetails?.DOB ?
+                                                            <div>{errors?.Attendees[index]?.personalDetails?.DOB}</div>
+                                                            :
+                                                            null
+                                                    }
                                                 </div>
                                             })
                                         }
                                     </>
+
                                 </div>
                                 :
                                 ''
@@ -564,10 +668,10 @@ function Staging() {
                     })
                 }
                 {
-                    totalGBP > 0 ?
+                    values.GBP > 0 ?
                         <div className='flex justify-between'>
                             <p className='text-xl font-semibold mt-8'>Total </p>
-                            <p className='text-xl font-semibold mt-8'>GBP {totalGBP}</p>
+                            <p className='text-xl font-semibold mt-8'>GBP {values.GBP}</p>
                         </div>
                         :
                         ''

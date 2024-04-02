@@ -20,18 +20,13 @@ function PracticeForm() {
             { IVDrip: true, VitaminShots: false },
             { IVDrip: true, VitaminShots: false },
         ],
-        personalDetails: [
-            { name: '', email: '', contactNumber: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-            { name: '', DOB: '' },
-        ],
+
         comments: '',
         GBP: '',
-
-
+        experiment: [
+            { experiment1: '', experiment2: '' },
+            { experiment1: '' }
+        ]
     }
     const { values, handleSubmit, handleChange, setFieldValue, touched, errors } = useFormik({
         initialValues,
@@ -56,20 +51,43 @@ function PracticeForm() {
 
     //ONCHANGE HANDLERS STARTED
     const handleNumberOfAttendees = (e) => {
+      
         setFieldValue(values.NoOfAttendees = Number(e.target.value))
-        const AttendeesToPush = [];
+
+
+        
+        var AttendeesToPush = [];
+        AttendeesToPush = values.Attendees
+        if(AttendeesToPush.find((val,index) => index === (e.target.value-1)))
+        {
+            console.log("Found")
+        }
         for (let i = 0; i < e.target.value; i++) {
-            AttendeesToPush.push({
-                location: true,
-                service: {
-                    IVDrip: [],
-                    VitaminShots: []
-                },
-                Details: []
-            })
+            if (i < 1) {
+                AttendeesToPush.push({
+                    location: true,
+                    service: {
+                        IVDrip: [],
+                        VitaminShots: []
+                    },
+                    personalDetails: { name: '', email: '', contactNumber: '', DOB: '' }
+                })
+            }
+            else {
+                AttendeesToPush.push({
+                    location: true,
+                    service: {
+                        IVDrip: [],
+                        VitaminShots: []
+                    },
+                    personalDetails: { name: '', DOB: '' }
+                })
+            }
         }
         setFieldValue(values.Attendees = AttendeesToPush)
     }
+
+    
 
     const handleLocation = (e) => {
         setFieldValue(values.InitialLocation = e.target.value)
@@ -142,6 +160,14 @@ function PracticeForm() {
             setFieldValue(values.GBP = totalGBP - GBP)
         }
     }
+
+    const handlePersonalDetails = (e, index) => {
+        if (e.target.name == 'name') return setFieldValue(values.Attendees[index].personalDetails.name = e.target.value)
+        if (e.target.name == 'email') return setFieldValue(values.Attendees[index].personalDetails.email = e.target.value)
+        if (e.target.name == 'DOB') return setFieldValue(values.Attendees[index].personalDetails.DOB = e.target.value)
+        if (e.target.name == 'contactNumber') return setFieldValue(values.Attendees[index].personalDetails.contactNumber = e.target.value)
+
+    }
     //ON CHANGE HANDLERS ENDED
 
 
@@ -187,7 +213,7 @@ function PracticeForm() {
     }
 
 
-    console.log(values,"Values")
+    console.log(values, "Values")
     console.log(errors, "Errors")
 
     return (
@@ -273,10 +299,10 @@ function PracticeForm() {
                                 onChange={(e) => handleDate(e)}
                             />
                             {
-                                errors.DateTime?.Date && touched.DateTime?.Date ? <div>{errors.DateTime?.Date + '*'}</div> 
-                                : null     
+                                errors.DateTime?.Date && touched.DateTime?.Date ? <div>{errors.DateTime?.Date + '*'}</div>
+                                    : null
                             }
-                            
+
 
                             <input
                                 type="time"
@@ -284,13 +310,13 @@ function PracticeForm() {
                                 onChange={(e) => handleTime(e)}
                             />
                             {
-                                errors.DateTime?.Time && touched.DateTime?.Time ? <div>{errors.DateTime?.Time + '*'}</div> 
-                                : null     
+                                errors.DateTime?.Time && touched.DateTime?.Time ? <div>{errors.DateTime?.Time + '*'}</div>
+                                    : null
                             }
                         </div>
-                        
+
                     </>
-                    
+
 
                     <>
                         {
@@ -397,12 +423,12 @@ function PracticeForm() {
                                                                 </div>
                                                                 {
                                                                     errors.Attendees ?
-                                                                       errors.Attendees[index] && touched.Attendees ?
-                                                                        <div>Required</div>
+                                                                        errors.Attendees[index] && touched.Attendees ?
+                                                                            <div>Required</div>
+                                                                            :
+                                                                            null
                                                                         :
                                                                         null
-                                                                    :
-                                                                    null
                                                                 }
 
 
@@ -429,31 +455,49 @@ function PracticeForm() {
                                                     <h1 className='text-semibold font-xl'>Attendee {Attendee}</h1>
                                                     <input
                                                         type='text'
-                                                        name={`personalDetails[${index}].name`}
-                                                        value={values.personalDetails[index].name}
+                                                        name='name'
+                                                        // value={values.personalDetails[index].name}
                                                         placeholder='Enter Name'
-                                                        onChange={handleChange}
+                                                        onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
+                                                    {
+                                                        errors?.Attendees?.[index]?.personalDetails?.name && touched.Attendees?.[index]?.personalDetails?.name ?
+                                                            <div>{errors?.Attendees[index]?.personalDetails?.name}</div>
+                                                            :
+                                                            null
+                                                    }
                                                     <br />
                                                     {
                                                         index < 1 ?
                                                             <>
                                                                 <input
                                                                     type='email'
-                                                                    name={`personalDetails[${index}].email`}
-                                                                    value={values.personalDetails[index].email}
-                                                                    onChange={handleChange}
+                                                                    name='email'
+                                                                    // value={values.personalDetails[index].email}
+                                                                    onChange={(e) => handlePersonalDetails(e, index)}
                                                                     placeholder='Enter Email'
 
                                                                 />
+                                                                {
+                                                                    errors?.Attendees?.[index]?.personalDetails?.email  && touched.Attendees?.[index]?.personalDetails?.email ?
+                                                                        <div>{errors?.Attendees[index]?.personalDetails?.email}</div>
+                                                                        :
+                                                                        null
+                                                                }
                                                                 <br />
                                                                 <input
                                                                     type='tel'
-                                                                    name={`personalDetails[${index}].contactNumber`}
-                                                                    value={values.personalDetails[index].contactNumber}
+                                                                    name='contactNumber'
+                                                                    // value={values.personalDetails[index].contactNumber}
                                                                     placeholder='Enter Contact Number'
-                                                                    onChange={handleChange}
+                                                                    onChange={(e) => handlePersonalDetails(e, index)}
                                                                 />
+                                                                {
+                                                                    errors?.Attendees?.[index]?.personalDetails?.contactNumber   && touched.Attendees?.[index]?.personalDetails?.contactNumber?
+                                                                        <div>{errors?.Attendees[index]?.personalDetails?.contactNumber}</div>
+                                                                        :
+                                                                        null
+                                                                }
                                                                 <br />
                                                             </>
                                                             :
@@ -461,15 +505,21 @@ function PracticeForm() {
                                                     }
                                                     <input
                                                         type='date'
-                                                        name={`personalDetails[${index}].DOB`}
-                                                        value={values.personalDetails[index].DOB}
-                                                        onChange={handleChange}
+                                                        name='DOB'
+                                                        // value={values.personalDetails[index].DOB}
+                                                        onChange={(e) => handlePersonalDetails(e, index)}
                                                     />
-
+                                                    {
+                                                        errors?.Attendees?.[index]?.personalDetails?.DOB   && touched.Attendees?.[index]?.personalDetails?.DOB ?
+                                                            <div>{errors?.Attendees[index]?.personalDetails?.DOB}</div>
+                                                            :
+                                                            null
+                                                    }
                                                 </div>
                                             })
                                         }
                                     </>
+                                    
                                 </div>
                                 :
                                 ''
